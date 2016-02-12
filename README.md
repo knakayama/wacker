@@ -5,7 +5,7 @@ Wraper script for Packer
 
 ## Description
 
-Create temporary vpc and subnet on AWS for packer build process, and also remove the garbages.
+Creates temporary vpc and subnet on AWS for packer build process, and also removes the garbages.
 
 ## Requirements
 
