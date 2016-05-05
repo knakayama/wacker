@@ -1,13 +1,14 @@
 wacker() {
   -wacker-usage() {
     cat <<'EOT'
-usage: wacker [-v vpc_cidr] [-a az] [-s subnet_cidr] [-h ] template
+usage: wacker [-v vpc_cidr] [-a az] [-s subnet_cidr] [-h ] [-o packer_options] template
 
 Options:
 
   -v vpc_cidr       VPC cidr block (172.16.0.0/16 by default)
   -a az             Availability zone (ap-northeast-1a by default)
   -s subnet_cidr    Subnet cidr block (172.16.1.0/24 by default)
+  -o packer_options Comma-Seprated Packer options
   -h                Show this help
 
 EOT
@@ -89,13 +90,14 @@ EOT
   local vpc_cidr="172.16.0.0/16"
   local az="ap-northeast-1a"
   local subnet_cidr="172.16.1.0/16"
+  local packer_options
   local vpc_id
   local subnet_id
   local igw_id
   local rtb_id
 
   local OPTARG OPTIND args
-  while getopts ':t:v:a:s:h' args; do
+  while getopts ':t:v:a:s:o:h' args; do
     case "$args" in
       v) vpc_cidr="$OPTARG"
         ;;
@@ -104,6 +106,9 @@ EOT
         ;;
       s)
         subnet_id="$OPTARG"
+        ;;
+      o)
+        packer_options="$OPTARG"
         ;;
       h)
         -wacker-usage
@@ -193,6 +198,7 @@ EOT
   packer build \
     -var "vpc_id=${vpc_id}" \
     -var "subnet_id=${subnet_id}" \
+    $(echo "$packer_options" | awk '{gsub(/,/, " ", $0); print}') \
     "$template"
 
   printf "\n"
